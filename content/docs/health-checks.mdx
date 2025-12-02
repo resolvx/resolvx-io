@@ -1,0 +1,199 @@
+---
+title: Health Checks
+description: Configuring endpoint health monitoring
+---
+
+# Health Checks
+
+Health checks monitor your endpoints and automatically remove unhealthy ones from DNS responses. This ensures clients are always directed to working servers.
+
+## Health Check Types
+
+### HTTP/HTTPS
+
+Check web endpoints by making HTTP requests:
+
+```json
+{
+  "type": "http",
+  "path": "/health",
+  "port": 80,
+  "method": "GET",
+  "expected_status": [200, 204],
+  "expected_body": "OK",
+  "headers": {
+    "Host": "example.com"
+  },
+  "interval": "30s",
+  "timeout": "5s",
+  "threshold": 3
+}
+```
+
+For HTTPS:
+
+```json
+{
+  "type": "https",
+  "path": "/health",
+  "port": 443,
+  "skip_tls_verify": false,
+  "interval": "30s",
+  "timeout": "5s"
+}
+```
+
+### TCP
+
+Verify TCP port connectivity:
+
+```json
+{
+  "type": "tcp",
+  "port": 443,
+  "interval": "30s",
+  "timeout": "5s",
+  "threshold": 3
+}
+```
+
+### DNS
+
+Query a DNS record and verify the response:
+
+```json
+{
+  "type": "dns",
+  "query": "health.example.com",
+  "record_type": "A",
+  "expected_value": "127.0.0.1",
+  "interval": "30s",
+  "timeout": "5s"
+}
+```
+
+## Configuration Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `interval` | Time between checks | `30s` |
+| `timeout` | Check timeout | `5s` |
+| `threshold` | Failures before marking unhealthy | `3` |
+| `healthy_threshold` | Successes before marking healthy | `2` |
+
+## Adding Health Checks to Policies
+
+Health checks are configured as part of GTM policies:
+
+```bash
+curl -X POST http://localhost:8080/api/v1/policies \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "api-failover",
+    "zone": "example.com",
+    "record": "api",
+    "type": "failover",
+    "endpoints": [
+      {"address": "192.168.1.100", "priority": 1},
+      {"address": "192.168.2.100", "priority": 2}
+    ],
+    "health_check": {
+      "type": "http",
+      "path": "/api/health",
+      "port": 8080,
+      "interval": "15s",
+      "timeout": "3s",
+      "threshold": 2
+    }
+  }'
+```
+
+## Health Status
+
+### Viewing Health Status
+
+```bash
+# All endpoints
+curl http://localhost:8080/api/v1/health
+
+# Specific policy
+curl http://localhost:8080/api/v1/policies/{name}/health
+```
+
+Response:
+
+```json
+{
+  "endpoints": [
+    {
+      "address": "192.168.1.100",
+      "status": "healthy",
+      "last_check": "2024-01-15T10:30:00Z",
+      "latency_ms": 45,
+      "consecutive_failures": 0
+    },
+    {
+      "address": "192.168.2.100",
+      "status": "unhealthy",
+      "last_check": "2024-01-15T10:30:00Z",
+      "latency_ms": null,
+      "consecutive_failures": 3,
+      "last_error": "connection refused"
+    }
+  ]
+}
+```
+
+### Health States
+
+| Status | Description |
+|--------|-------------|
+| `healthy` | Endpoint is passing health checks |
+| `unhealthy` | Endpoint has failed threshold checks |
+| `unknown` | Not enough data (new endpoint) |
+
+## Dashboard Monitoring
+
+The ResolvX dashboard provides real-time health monitoring:
+
+1. Navigate to **Health** in the sidebar
+2. View all endpoints and their current status
+3. See historical health data and latency graphs
+
+## Best Practices
+
+### Endpoint Health Pages
+
+Create dedicated health endpoints:
+
+```javascript
+// Express.js example
+app.get('/health', (req, res) => {
+  const healthy = checkDependencies();
+  if (healthy) {
+    res.status(200).json({ status: 'ok' });
+  } else {
+    res.status(503).json({ status: 'unhealthy' });
+  }
+});
+```
+
+### Interval Tuning
+
+- **Critical services**: 10-15s intervals
+- **Standard services**: 30s intervals
+- **Stable services**: 60s intervals
+
+### Threshold Settings
+
+- Lower thresholds = faster failover, more false positives
+- Higher thresholds = slower failover, fewer false positives
+
+Recommended starting point:
+- `threshold: 3` for unhealthy
+- `healthy_threshold: 2` for recovery
+
+## Next Steps
+
+- [Clustering](/docs/clustering) - High availability setup
+- [API Reference](/docs/api) - Full API documentation

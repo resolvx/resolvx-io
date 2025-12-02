@@ -1,0 +1,79 @@
+---
+title: Introduction
+description: Welcome to ResolvX - Open Source DNS with Global Traffic Management
+---
+
+# Welcome to ResolvX
+
+ResolvX is an open-source DNS server with built-in **Global Traffic Management (GTM)**. The core design philosophy is **single binary, zero dependencies** — everything needed to run a production DNS server with GTM capabilities is embedded in one Go executable.
+
+## What Makes ResolvX Different
+
+Unlike traditional DNS/GTM setups that require separate Redis, NATS, databases, and load balancers, ResolvX embeds all components:
+
+- **Storage**: BadgerDB (embedded, pure Go)
+- **Cache**: Ristretto (in-memory, pure Go)
+- **Events/Clustering**: NATS (embedded server)
+- **UI**: Static assets via `go:embed`
+- **HA**: Cluster-managed floating VIP (no external LB)
+
+The result: `resolvx server` gives you everything. Adding `--join=peer:6222` gives you clustering.
+
+## Quick Start
+
+```bash
+# Download the binary
+curl -LO https://github.com/resolvx/resolvx/releases/latest/download/resolvx
+
+# Make it executable
+chmod +x resolvx
+
+# Start the server
+./resolvx server
+```
+
+## Key Features
+
+<Cards>
+  <Card title="Single Binary" href="/docs/installation">
+    Everything compiles into one executable. No Redis, no NATS cluster, no external databases.
+  </Card>
+  <Card title="Global Traffic Management" href="/docs/gtm-overview">
+    Built-in GTM with geographic, weighted, latency-based, and failover routing.
+  </Card>
+  <Card title="Easy Clustering" href="/docs/clustering">
+    Add --join=peer:6222 and you have a cluster. NATS handles coordination.
+  </Card>
+  <Card title="REST API" href="/docs/api">
+    Full REST API for managing zones, records, and policies programmatically.
+  </Card>
+</Cards>
+
+## Architecture Overview
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│                        resolvx binary                          │
+├────────────────────────────────────────────────────────────────┤
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐       │
+│  │   DNS    │  │   GTM    │  │   API    │  │  Web UI  │       │
+│  │   :53    │  │  Engine  │  │  :8080   │  │(embedded)│       │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘       │
+│       └─────────────┴──────┬──────┴─────────────┘             │
+│                    ┌───────▼───────┐                          │
+│                    │  Core Engine  │                          │
+│                    └───────┬───────┘                          │
+│       ┌────────────────────┼────────────────────┐             │
+│       ▼                    ▼                    ▼             │
+│  ┌──────────┐        ┌──────────┐        ┌──────────┐         │
+│  │  Cache   │        │ Storage  │        │  Events  │         │
+│  │(ristretto│        │(BadgerDB)│        │  (NATS)  │         │
+│  └──────────┘        └──────────┘        └──────────┘         │
+└────────────────────────────────────────────────────────────────┘
+```
+
+## Next Steps
+
+- [Installation Guide](/docs/installation) - Download and install ResolvX
+- [Configuration](/docs/configuration) - Configure ResolvX for your environment
+- [Quick Start](/docs/quickstart) - Get up and running in 5 minutes

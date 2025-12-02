@@ -1,0 +1,245 @@
+---
+title: Clustering
+description: Setting up ResolvX for high availability
+---
+
+# Clustering
+
+ResolvX supports clustering for high availability. Multiple nodes share state and can serve DNS queries, with automatic leader election and failover.
+
+## Architecture
+
+```
+                    ┌─────────────┐
+                    │     VIP     │
+                    │192.168.1.10 │
+                    └──────┬──────┘
+                           │
+        ┌──────────────────┼──────────────────┐
+        │                  │                  │
+        ▼                  ▼                  ▼
+┌───────────────┐  ┌───────────────┐  ┌───────────────┐
+│    Node 1     │  │    Node 2     │  │    Node 3     │
+│   (Leader)    │  │  (Follower)   │  │  (Follower)   │
+│ 192.168.1.11  │  │ 192.168.1.12  │  │ 192.168.1.13  │
+└───────┬───────┘  └───────┬───────┘  └───────┬───────┘
+        │                  │                  │
+        └──────────────────┴──────────────────┘
+                    NATS Cluster
+```
+
+## Setting Up a Cluster
+
+### Node 1 (Seed Node)
+
+```yaml title="node1.yaml"
+cluster:
+  enabled: true
+  node_id: "node1"
+  nats:
+    listen: ":4222"
+    cluster_listen: ":6222"
+    routes: []
+  vip:
+    enabled: true
+    address: "192.168.1.10/24"
+    interface: "eth0"
+```
+
+Start the first node:
+
+```bash
+./resolvx server --config node1.yaml
+```
+
+### Node 2
+
+```yaml title="node2.yaml"
+cluster:
+  enabled: true
+  node_id: "node2"
+  nats:
+    listen: ":4222"
+    cluster_listen: ":6222"
+    routes:
+      - "nats://192.168.1.11:6222"
+  vip:
+    enabled: true
+    address: "192.168.1.10/24"
+    interface: "eth0"
+```
+
+```bash
+./resolvx server --config node2.yaml
+```
+
+Or use the `--join` flag:
+
+```bash
+./resolvx server --join 192.168.1.11:6222
+```
+
+### Node 3
+
+```yaml title="node3.yaml"
+cluster:
+  enabled: true
+  node_id: "node3"
+  nats:
+    listen: ":4222"
+    cluster_listen: ":6222"
+    routes:
+      - "nats://192.168.1.11:6222"
+      - "nats://192.168.1.12:6222"
+  vip:
+    enabled: true
+    address: "192.168.1.10/24"
+    interface: "eth0"
+```
+
+## Leader Election
+
+ResolvX uses NATS JetStream for leader election:
+
+1. All nodes participate in election
+2. One node becomes leader
+3. Leader claims the VIP and runs health checks
+4. Followers serve DNS queries with replicated data
+5. If leader fails, new election occurs automatically
+
+### Viewing Leader Status
+
+```bash
+curl http://localhost:8080/api/v1/cluster
+```
+
+Response:
+
+```json
+{
+  "node_id": "node1",
+  "is_leader": true,
+  "leader": "node1",
+  "nodes": [
+    {
+      "id": "node1",
+      "address": "192.168.1.11",
+      "status": "healthy",
+      "is_leader": true
+    },
+    {
+      "id": "node2",
+      "address": "192.168.1.12",
+      "status": "healthy",
+      "is_leader": false
+    },
+    {
+      "id": "node3",
+      "address": "192.168.1.13",
+      "status": "healthy",
+      "is_leader": false
+    }
+  ]
+}
+```
+
+## Virtual IP (VIP)
+
+The cluster manages a floating VIP that always points to the leader:
+
+### How It Works
+
+1. Leader adds VIP to its network interface
+2. Leader sends gratuitous ARP to update network
+3. On failover, new leader claims VIP
+4. Old leader releases VIP
+
+### Requirements
+
+- All nodes on same L2 network
+- `cap_net_admin` capability for ARP management
+- VIP address not used by other hosts
+
+### Configuration
+
+```yaml
+vip:
+  enabled: true
+  address: "192.168.1.10/24"
+  interface: "eth0"
+  gratuitous_arp_count: 3
+```
+
+## State Synchronization
+
+Changes propagate across the cluster via NATS:
+
+| Event | Propagation |
+|-------|-------------|
+| Zone created/updated/deleted | Immediate |
+| Record created/updated/deleted | Immediate |
+| Policy changes | Immediate |
+| Health status changes | Immediate |
+
+## Monitoring the Cluster
+
+### Dashboard
+
+The ResolvX dashboard shows cluster status on the **Cluster** page:
+
+- Node list and status
+- Leader indicator
+- VIP assignment
+- Replication lag
+
+### CLI
+
+```bash
+./resolvx cluster status
+
+# Output:
+# Cluster Status: healthy
+# Leader: node1 (192.168.1.11)
+# VIP: 192.168.1.10
+#
+# Nodes:
+#   node1  192.168.1.11  leader   healthy
+#   node2  192.168.1.12  follower healthy
+#   node3  192.168.1.13  follower healthy
+```
+
+## Failure Scenarios
+
+### Leader Failure
+
+1. NATS detects leader disconnect
+2. Remaining nodes hold election
+3. New leader claims VIP
+4. DNS service continues with minimal interruption
+
+### Network Partition
+
+- Split-brain prevention via NATS quorum
+- Minority partition becomes read-only
+- Majority partition continues normal operation
+
+### Adding/Removing Nodes
+
+```bash
+# Add a node
+./resolvx server --join existing-node:6222
+
+# Remove a node (graceful)
+./resolvx cluster leave
+```
+
+## Best Practices
+
+1. **Odd number of nodes** - Prevents split-brain (3, 5, 7 nodes)
+2. **Separate failure domains** - Different racks/availability zones
+3. **Monitor cluster health** - Alert on node failures
+4. **Test failover** - Regularly verify failover works
+
+## Next Steps
+
+- [API Reference](/docs/api) - Full API documentation

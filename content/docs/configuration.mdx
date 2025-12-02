@@ -1,0 +1,180 @@
+---
+title: Configuration
+description: Configure ResolvX for your environment
+---
+
+# Configuration
+
+ResolvX can be configured through a YAML file, environment variables, or command-line flags.
+
+## Configuration File
+
+Create a configuration file at `/etc/resolvx/resolvx.yaml`:
+
+```yaml title="resolvx.yaml"
+# DNS Server settings
+dns:
+  listen: ":53"
+  upstream:
+    - "8.8.8.8:53"
+    - "1.1.1.1:53"
+
+# API Server settings
+api:
+  listen: ":8080"
+  cors:
+    enabled: true
+    origins:
+      - "*"
+
+# Storage settings
+storage:
+  type: "badger"
+  path: "/var/lib/resolvx/data"
+
+# Cache settings
+cache:
+  enabled: true
+  max_size: "100MB"
+  default_ttl: "5m"
+
+# Logging
+logging:
+  level: "info"
+  format: "json"
+
+# Clustering (optional)
+cluster:
+  enabled: false
+  node_id: "node1"
+  nats:
+    listen: ":4222"
+    cluster_listen: ":6222"
+    routes: []
+  vip:
+    enabled: false
+    address: ""
+    interface: ""
+```
+
+## Environment Variables
+
+All configuration options can be set via environment variables with the `RESOLVX_` prefix:
+
+```bash
+export RESOLVX_DNS_LISTEN=":53"
+export RESOLVX_API_LISTEN=":8080"
+export RESOLVX_STORAGE_PATH="/var/lib/resolvx/data"
+export RESOLVX_LOGGING_LEVEL="debug"
+```
+
+## Command-Line Flags
+
+Override configuration at runtime with flags:
+
+```bash
+resolvx server \
+  --config /etc/resolvx/resolvx.yaml \
+  --dns-listen :53 \
+  --api-listen :8080 \
+  --log-level debug
+```
+
+## Configuration Precedence
+
+Configuration is loaded in this order (later sources override earlier):
+
+1. Default values
+2. Configuration file
+3. Environment variables
+4. Command-line flags
+
+## Key Configuration Options
+
+### DNS Settings
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `dns.listen` | `:53` | Address to listen for DNS queries |
+| `dns.upstream` | `["8.8.8.8:53"]` | Upstream DNS servers for forwarding |
+| `dns.timeout` | `5s` | Query timeout |
+
+### API Settings
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `api.listen` | `:8080` | Address for REST API and Web UI |
+| `api.cors.enabled` | `true` | Enable CORS |
+| `api.cors.origins` | `["*"]` | Allowed origins |
+
+### Storage Settings
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `storage.type` | `badger` | Storage backend (badger, jetstream) |
+| `storage.path` | `/var/lib/resolvx/data` | Data directory |
+
+### Cache Settings
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `cache.enabled` | `true` | Enable response caching |
+| `cache.max_size` | `100MB` | Maximum cache size |
+| `cache.default_ttl` | `5m` | Default TTL for cached entries |
+
+## Example Configurations
+
+### Minimal Configuration
+
+```yaml
+dns:
+  listen: ":53"
+api:
+  listen: ":8080"
+```
+
+### Production Single Node
+
+```yaml
+dns:
+  listen: ":53"
+  upstream:
+    - "8.8.8.8:53"
+    - "1.1.1.1:53"
+api:
+  listen: ":8080"
+storage:
+  path: "/var/lib/resolvx/data"
+cache:
+  max_size: "500MB"
+logging:
+  level: "info"
+  format: "json"
+```
+
+### Clustered Setup
+
+```yaml
+dns:
+  listen: ":53"
+api:
+  listen: ":8080"
+cluster:
+  enabled: true
+  node_id: "node1"
+  nats:
+    listen: ":4222"
+    cluster_listen: ":6222"
+    routes:
+      - "nats://node2:6222"
+      - "nats://node3:6222"
+  vip:
+    enabled: true
+    address: "192.168.1.100/24"
+    interface: "eth0"
+```
+
+## Next Steps
+
+- [Quick Start](/docs/quickstart) - Get ResolvX running
+- [Zones](/docs/zones) - Create and manage DNS zones

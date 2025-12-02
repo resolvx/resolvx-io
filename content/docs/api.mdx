@@ -1,0 +1,375 @@
+---
+title: API Reference
+description: ResolvX REST API documentation
+---
+
+# API Reference
+
+ResolvX provides a RESTful API for managing zones, records, policies, and monitoring cluster health.
+
+## Base URL
+
+```
+http://localhost:8080/api/v1
+```
+
+## Authentication
+
+By default, the API does not require authentication. For production deployments, configure authentication in your config file.
+
+## Response Format
+
+All responses are JSON:
+
+```json
+{
+  "data": { ... },
+  "error": null
+}
+```
+
+Error responses:
+
+```json
+{
+  "data": null,
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "Zone not found"
+  }
+}
+```
+
+---
+
+## Zones
+
+### List Zones
+
+```http
+GET /api/v1/zones
+```
+
+**Response:**
+
+```json
+{
+  "zones": [
+    {
+      "name": "example.com",
+      "soa": {
+        "mname": "ns1.example.com.",
+        "rname": "admin.example.com.",
+        "serial": 2024011501,
+        "refresh": 86400,
+        "retry": 7200,
+        "expire": 3600000,
+        "minimum": 300
+      },
+      "created_at": "2024-01-15T10:30:00Z",
+      "updated_at": "2024-01-15T10:30:00Z"
+    }
+  ]
+}
+```
+
+### Get Zone
+
+```http
+GET /api/v1/zones/{zone_name}
+```
+
+### Create Zone
+
+```http
+POST /api/v1/zones
+Content-Type: application/json
+
+{
+  "name": "example.com"
+}
+```
+
+### Delete Zone
+
+```http
+DELETE /api/v1/zones/{zone_name}
+```
+
+### Export Zone File
+
+```http
+GET /api/v1/zones/{zone_name}/export
+Accept: text/plain
+```
+
+Returns BIND-format zone file.
+
+---
+
+## Records
+
+### List Records
+
+```http
+GET /api/v1/zones/{zone_name}/records
+```
+
+**Query Parameters:**
+
+| Parameter | Description |
+|-----------|-------------|
+| `type` | Filter by record type (A, AAAA, CNAME, etc.) |
+| `name` | Filter by record name |
+
+### Get Record
+
+```http
+GET /api/v1/zones/{zone_name}/records/{record_id}
+```
+
+### Create Record
+
+```http
+POST /api/v1/zones/{zone_name}/records
+Content-Type: application/json
+
+{
+  "name": "www",
+  "type": "A",
+  "value": "192.168.1.100",
+  "ttl": 300
+}
+```
+
+**For MX records:**
+
+```json
+{
+  "name": "@",
+  "type": "MX",
+  "value": "mail.example.com.",
+  "priority": 10,
+  "ttl": 300
+}
+```
+
+### Update Record
+
+```http
+PUT /api/v1/zones/{zone_name}/records/{record_id}
+Content-Type: application/json
+
+{
+  "value": "192.168.1.200",
+  "ttl": 600
+}
+```
+
+### Delete Record
+
+```http
+DELETE /api/v1/zones/{zone_name}/records/{record_id}
+```
+
+---
+
+## Policies
+
+### List Policies
+
+```http
+GET /api/v1/policies
+```
+
+### Get Policy
+
+```http
+GET /api/v1/policies/{policy_name}
+```
+
+### Create Policy
+
+```http
+POST /api/v1/policies
+Content-Type: application/json
+
+{
+  "name": "www-failover",
+  "zone": "example.com",
+  "record": "www",
+  "type": "failover",
+  "endpoints": [
+    {"address": "192.168.1.100", "priority": 1},
+    {"address": "192.168.2.100", "priority": 2}
+  ],
+  "health_check": {
+    "type": "http",
+    "path": "/health",
+    "interval": "30s"
+  }
+}
+```
+
+### Update Policy
+
+```http
+PUT /api/v1/policies/{policy_name}
+Content-Type: application/json
+
+{ ... }
+```
+
+### Delete Policy
+
+```http
+DELETE /api/v1/policies/{policy_name}
+```
+
+### Get Policy Health
+
+```http
+GET /api/v1/policies/{policy_name}/health
+```
+
+---
+
+## Health
+
+### Get All Health Status
+
+```http
+GET /api/v1/health
+```
+
+**Response:**
+
+```json
+{
+  "status": "healthy",
+  "endpoints": [
+    {
+      "address": "192.168.1.100",
+      "policy": "www-failover",
+      "status": "healthy",
+      "last_check": "2024-01-15T10:30:00Z",
+      "latency_ms": 45
+    }
+  ]
+}
+```
+
+---
+
+## Cluster
+
+### Get Cluster Status
+
+```http
+GET /api/v1/cluster
+```
+
+**Response:**
+
+```json
+{
+  "node_id": "node1",
+  "is_leader": true,
+  "leader": "node1",
+  "vip": "192.168.1.10",
+  "nodes": [
+    {
+      "id": "node1",
+      "address": "192.168.1.11",
+      "status": "healthy",
+      "is_leader": true
+    },
+    {
+      "id": "node2",
+      "address": "192.168.1.12",
+      "status": "healthy",
+      "is_leader": false
+    }
+  ]
+}
+```
+
+### Get Node Info
+
+```http
+GET /api/v1/cluster/node
+```
+
+---
+
+## Server Info
+
+### Get Server Status
+
+```http
+GET /api/v1/status
+```
+
+**Response:**
+
+```json
+{
+  "version": "1.0.0",
+  "uptime": "24h35m12s",
+  "dns_queries": 1523456,
+  "cache_hit_rate": 0.85,
+  "zones_count": 5,
+  "records_count": 127
+}
+```
+
+### Get Metrics
+
+```http
+GET /api/v1/metrics
+```
+
+Returns Prometheus-format metrics.
+
+---
+
+## Error Codes
+
+| Code | HTTP Status | Description |
+|------|-------------|-------------|
+| `NOT_FOUND` | 404 | Resource not found |
+| `ALREADY_EXISTS` | 409 | Resource already exists |
+| `INVALID_REQUEST` | 400 | Invalid request body |
+| `VALIDATION_ERROR` | 422 | Validation failed |
+| `INTERNAL_ERROR` | 500 | Internal server error |
+
+---
+
+## Rate Limiting
+
+By default, no rate limiting is applied. Configure rate limits in production:
+
+```yaml
+api:
+  rate_limit:
+    enabled: true
+    requests_per_second: 100
+    burst: 200
+```
+
+## CORS
+
+CORS is enabled by default. Configure allowed origins:
+
+```yaml
+api:
+  cors:
+    enabled: true
+    origins:
+      - "https://dashboard.example.com"
+    methods:
+      - "GET"
+      - "POST"
+      - "PUT"
+      - "DELETE"
+```

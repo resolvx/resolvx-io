@@ -1,0 +1,161 @@
+---
+title: GTM Overview
+description: Global Traffic Management in ResolvX
+---
+
+# Global Traffic Management
+
+ResolvX includes built-in Global Traffic Management (GTM) capabilities, allowing you to intelligently route DNS queries based on various criteria.
+
+## What is GTM?
+
+Global Traffic Management uses DNS to direct clients to optimal endpoints based on:
+
+- **Geographic location** - Route users to the nearest datacenter
+- **Health status** - Avoid unhealthy endpoints
+- **Load distribution** - Spread traffic across endpoints
+- **Latency** - Route to the fastest responding endpoint
+
+## How It Works
+
+```
+┌─────────────┐     DNS Query      ┌─────────────┐
+│   Client    │ ──────────────────▶│   ResolvX   │
+│  (Browser)  │                    │   Server    │
+└─────────────┘                    └──────┬──────┘
+                                          │
+                                          ▼
+                                   ┌──────────────┐
+                                   │ GTM Engine   │
+                                   │ ┌──────────┐ │
+                                   │ │ Policy   │ │
+                                   │ │ Evaluate │ │
+                                   │ └──────────┘ │
+                                   │ ┌──────────┐ │
+                                   │ │ Health   │ │
+                                   │ │ Check    │ │
+                                   │ └──────────┘ │
+                                   └──────┬───────┘
+                                          │
+                                          ▼
+                                   Select Best Endpoint
+                                          │
+                                          ▼
+┌─────────────┐    DNS Response    ┌──────────────┐
+│   Client    │ ◀────────────────  │   Optimal    │
+│  (Browser)  │    IP Address      │   Endpoint   │
+└─────────────┘                    └──────────────┘
+```
+
+## Policy Types
+
+ResolvX supports four routing policies:
+
+### Geographic
+
+Route traffic based on the client's geographic location using GeoIP data.
+
+```yaml
+policy:
+  type: geographic
+  endpoints:
+    - region: "US-WEST"
+      address: "192.168.1.100"
+    - region: "US-EAST"
+      address: "192.168.2.100"
+    - region: "EU"
+      address: "192.168.3.100"
+```
+
+### Weighted
+
+Distribute traffic across endpoints based on weights.
+
+```yaml
+policy:
+  type: weighted
+  endpoints:
+    - address: "192.168.1.100"
+      weight: 70
+    - address: "192.168.2.100"
+      weight: 30
+```
+
+### Latency
+
+Route to the endpoint with the lowest latency.
+
+```yaml
+policy:
+  type: latency
+  endpoints:
+    - address: "192.168.1.100"
+    - address: "192.168.2.100"
+    - address: "192.168.3.100"
+```
+
+### Failover
+
+Primary/backup routing with automatic failover.
+
+```yaml
+policy:
+  type: failover
+  endpoints:
+    - address: "192.168.1.100"
+      priority: 1  # Primary
+    - address: "192.168.2.100"
+      priority: 2  # Secondary
+    - address: "192.168.3.100"
+      priority: 3  # Tertiary
+```
+
+## Health Checks
+
+GTM policies work with health checks to ensure traffic only goes to healthy endpoints:
+
+- **HTTP/HTTPS probes** - Check web endpoints
+- **TCP probes** - Verify port connectivity
+- **DNS probes** - Test DNS responses
+
+See [Health Checks](/docs/health-checks) for detailed configuration.
+
+## Creating a GTM Policy
+
+### Via API
+
+```bash
+curl -X POST http://localhost:8080/api/v1/policies \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "www-geographic",
+    "zone": "example.com",
+    "record": "www",
+    "type": "geographic",
+    "endpoints": [
+      {"region": "US", "address": "192.168.1.100"},
+      {"region": "EU", "address": "192.168.2.100"}
+    ],
+    "health_check": {
+      "type": "http",
+      "path": "/health",
+      "interval": "30s"
+    }
+  }'
+```
+
+### Via CLI
+
+```bash
+resolvx policy create www-geographic \
+  --zone example.com \
+  --record www \
+  --type geographic \
+  --endpoint "US:192.168.1.100" \
+  --endpoint "EU:192.168.2.100"
+```
+
+## Next Steps
+
+- [Policies](/docs/policies) - Detailed policy configuration
+- [Health Checks](/docs/health-checks) - Configure health monitoring

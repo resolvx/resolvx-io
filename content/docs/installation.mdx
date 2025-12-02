@@ -1,0 +1,113 @@
+---
+title: Installation
+description: How to install ResolvX on your system
+---
+
+# Installation
+
+ResolvX is distributed as a single binary with no external dependencies. Choose your preferred installation method below.
+
+## Download Binary
+
+Download the latest release for your platform from GitHub:
+
+```bash
+# Linux (amd64)
+curl -LO https://github.com/resolvx/resolvx/releases/latest/download/resolvx-linux-amd64
+mv resolvx-linux-amd64 resolvx
+
+# Linux (arm64)
+curl -LO https://github.com/resolvx/resolvx/releases/latest/download/resolvx-linux-arm64
+mv resolvx-linux-arm64 resolvx
+
+# macOS (arm64 - Apple Silicon)
+curl -LO https://github.com/resolvx/resolvx/releases/latest/download/resolvx-darwin-arm64
+mv resolvx-darwin-arm64 resolvx
+
+# macOS (amd64 - Intel)
+curl -LO https://github.com/resolvx/resolvx/releases/latest/download/resolvx-darwin-amd64
+mv resolvx-darwin-amd64 resolvx
+```
+
+Make the binary executable:
+
+```bash
+chmod +x resolvx
+```
+
+## Build from Source
+
+If you prefer to build from source, you'll need Go 1.21 or later:
+
+```bash
+# Clone the repository
+git clone https://github.com/resolvx/resolvx.git
+cd resolvx
+
+# Build the binary
+make build
+
+# Or build with the UI embedded
+make build-all
+```
+
+The binary will be created at `./bin/resolvx`.
+
+## Docker
+
+Run ResolvX in a Docker container:
+
+```bash
+docker run -d \
+  --name resolvx \
+  -p 53:53/udp \
+  -p 53:53/tcp \
+  -p 8080:8080 \
+  -v resolvx-data:/var/lib/resolvx \
+  ghcr.io/resolvx/resolvx:latest
+```
+
+## System Requirements
+
+- **CPU**: 1 core minimum, 2+ recommended
+- **Memory**: 256MB minimum, 512MB+ recommended
+- **Disk**: 100MB for binary, plus storage for zones/data
+- **Ports**: 53 (DNS), 8080 (API/UI), 4222 (NATS), 6222 (NATS Cluster)
+
+## Permissions
+
+ResolvX requires certain permissions to function:
+
+```bash
+# Option 1: Run as root (not recommended for production)
+sudo ./resolvx server
+
+# Option 2: Grant capabilities (recommended)
+sudo setcap 'cap_net_bind_service=+ep cap_net_admin=+ep' ./resolvx
+./resolvx server
+```
+
+The capabilities needed are:
+- `cap_net_bind_service`: Bind to port 53
+- `cap_net_admin`: Manage VIP for clustering (optional)
+
+## Verify Installation
+
+Check that ResolvX is working:
+
+```bash
+./resolvx version
+```
+
+You should see output similar to:
+
+```
+ResolvX v1.0.0
+Built: 2024-01-15T10:30:00Z
+Go: go1.21.5
+```
+
+## Next Steps
+
+- [Configuration](/docs/configuration) - Configure ResolvX for your environment
+- [Quick Start](/docs/quickstart) - Get up and running quickly

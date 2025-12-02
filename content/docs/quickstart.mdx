@@ -1,0 +1,134 @@
+---
+title: Quick Start
+description: Get ResolvX up and running in 5 minutes
+---
+
+# Quick Start
+
+This guide will help you get ResolvX running and serving DNS queries in just a few minutes.
+
+## Step 1: Download and Install
+
+```bash
+# Download the latest release
+curl -LO https://github.com/resolvx/resolvx/releases/latest/download/resolvx-linux-amd64
+mv resolvx-linux-amd64 resolvx
+chmod +x resolvx
+
+# Grant required capabilities
+sudo setcap 'cap_net_bind_service=+ep' ./resolvx
+```
+
+## Step 2: Start the Server
+
+```bash
+./resolvx server
+```
+
+You should see output like:
+
+```
+INFO DNS server listening on :53
+INFO API server listening on :8080
+INFO NATS embedded server started
+INFO Ready to serve queries
+```
+
+## Step 3: Access the Dashboard
+
+Open your browser and navigate to [http://localhost:8080](http://localhost:8080) to access the ResolvX dashboard.
+
+## Step 4: Create Your First Zone
+
+Using the API:
+
+```bash
+curl -X POST http://localhost:8080/api/v1/zones \
+  -H "Content-Type: application/json" \
+  -d '{"name": "example.com"}'
+```
+
+Or use the dashboard to create a zone through the UI.
+
+## Step 5: Add DNS Records
+
+Add an A record:
+
+```bash
+curl -X POST http://localhost:8080/api/v1/zones/example.com/records \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "www",
+    "type": "A",
+    "value": "192.168.1.100",
+    "ttl": 300
+  }'
+```
+
+## Step 6: Test DNS Resolution
+
+Query your new record:
+
+```bash
+dig @localhost www.example.com
+
+# Expected output:
+# www.example.com.    300    IN    A    192.168.1.100
+```
+
+## Using the CLI
+
+ResolvX also includes CLI commands for management:
+
+```bash
+# List zones
+./resolvx zone list
+
+# Create a zone
+./resolvx zone create example.com
+
+# Add a record
+./resolvx record create example.com www A 192.168.1.100 --ttl 300
+
+# List records
+./resolvx record list example.com
+```
+
+## What's Next?
+
+Now that you have ResolvX running, explore these features:
+
+- [Create more zones](/docs/zones) - Manage your DNS zones
+- [Add different record types](/docs/records) - A, AAAA, CNAME, MX, TXT, and more
+- [Set up GTM policies](/docs/gtm-overview) - Global traffic management
+- [Configure clustering](/docs/clustering) - High availability setup
+
+## Common Issues
+
+### Permission Denied on Port 53
+
+If you see a permission error, ensure you've granted the required capabilities:
+
+```bash
+sudo setcap 'cap_net_bind_service=+ep' ./resolvx
+```
+
+Or run with sudo (not recommended for production):
+
+```bash
+sudo ./resolvx server
+```
+
+### Port Already in Use
+
+If port 53 is already in use, you may have another DNS service running. Check with:
+
+```bash
+sudo lsof -i :53
+```
+
+Stop the conflicting service or configure ResolvX to use a different port:
+
+```bash
+./resolvx server --dns-listen :5353
+```

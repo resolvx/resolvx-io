@@ -1,0 +1,164 @@
+---
+title: Records
+description: Managing DNS records in ResolvX
+---
+
+# DNS Records
+
+DNS records are the building blocks of your zones. ResolvX supports all common DNS record types.
+
+## Supported Record Types
+
+| Type | Description | Example Value |
+|------|-------------|---------------|
+| **A** | IPv4 address | `192.168.1.100` |
+| **AAAA** | IPv6 address | `2001:db8::1` |
+| **CNAME** | Canonical name (alias) | `www.example.com.` |
+| **MX** | Mail exchange | `10 mail.example.com.` |
+| **TXT** | Text record | `"v=spf1 include:_spf.google.com ~all"` |
+| **NS** | Nameserver | `ns1.example.com.` |
+| **SRV** | Service record | `10 5 5060 sip.example.com.` |
+| **PTR** | Pointer (reverse DNS) | `www.example.com.` |
+| **CAA** | Certificate Authority Authorization | `0 issue "letsencrypt.org"` |
+
+## Creating Records
+
+### Via Dashboard
+
+1. Navigate to **Records** in the sidebar
+2. Select a zone from the dropdown
+3. Click **Add Record**
+4. Fill in the record details
+5. Click **Create**
+
+### Via API
+
+```bash
+# A Record
+curl -X POST http://localhost:8080/api/v1/zones/example.com/records \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "www",
+    "type": "A",
+    "value": "192.168.1.100",
+    "ttl": 300
+  }'
+
+# CNAME Record
+curl -X POST http://localhost:8080/api/v1/zones/example.com/records \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "blog",
+    "type": "CNAME",
+    "value": "www.example.com.",
+    "ttl": 300
+  }'
+
+# MX Record
+curl -X POST http://localhost:8080/api/v1/zones/example.com/records \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "@",
+    "type": "MX",
+    "value": "mail.example.com.",
+    "priority": 10,
+    "ttl": 300
+  }'
+
+# TXT Record
+curl -X POST http://localhost:8080/api/v1/zones/example.com/records \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "@",
+    "type": "TXT",
+    "value": "v=spf1 include:_spf.google.com ~all",
+    "ttl": 300
+  }'
+```
+
+### Via CLI
+
+```bash
+# A Record
+resolvx record create example.com www A 192.168.1.100 --ttl 300
+
+# CNAME Record
+resolvx record create example.com blog CNAME www.example.com. --ttl 300
+
+# MX Record
+resolvx record create example.com @ MX mail.example.com. --priority 10 --ttl 300
+```
+
+## Listing Records
+
+### Via API
+
+```bash
+# All records in a zone
+curl http://localhost:8080/api/v1/zones/example.com/records
+
+# Filter by type
+curl "http://localhost:8080/api/v1/zones/example.com/records?type=A"
+
+# Filter by name
+curl "http://localhost:8080/api/v1/zones/example.com/records?name=www"
+```
+
+### Via CLI
+
+```bash
+resolvx record list example.com
+resolvx record list example.com --type A
+```
+
+## Updating Records
+
+### Via API
+
+```bash
+curl -X PUT http://localhost:8080/api/v1/zones/example.com/records/{record_id} \
+  -H "Content-Type: application/json" \
+  -d '{
+    "value": "192.168.1.200",
+    "ttl": 600
+  }'
+```
+
+## Deleting Records
+
+### Via API
+
+```bash
+curl -X DELETE http://localhost:8080/api/v1/zones/example.com/records/{record_id}
+```
+
+### Via CLI
+
+```bash
+resolvx record delete example.com {record_id}
+```
+
+## Record Name Conventions
+
+- Use `@` for the zone apex (e.g., `example.com` itself)
+- Use relative names without the zone suffix (e.g., `www` not `www.example.com`)
+- CNAME targets should end with a dot (`.`) if fully qualified
+
+## TTL (Time To Live)
+
+TTL controls how long DNS resolvers cache a record:
+
+| TTL | Use Case |
+|-----|----------|
+| 60-300s | Records that change frequently |
+| 300-3600s | Standard records |
+| 3600-86400s | Stable records |
+
+<Callout>
+Lower TTLs mean faster propagation of changes but more DNS queries to your server.
+</Callout>
+
+## Next Steps
+
+- [GTM Overview](/docs/gtm-overview) - Apply traffic management to your records
+- [Policies](/docs/policies) - Configure routing policies

@@ -1,0 +1,223 @@
+---
+title: Policies
+description: Configuring GTM routing policies
+---
+
+# Routing Policies
+
+Policies define how ResolvX routes DNS queries to your endpoints. Each policy type offers different traffic distribution strategies.
+
+## Geographic Routing
+
+Route traffic based on the geographic location of the DNS resolver making the query.
+
+### Configuration
+
+```json
+{
+  "name": "www-geo",
+  "zone": "example.com",
+  "record": "www",
+  "type": "geographic",
+  "endpoints": [
+    {
+      "region": "NA",
+      "address": "us.example.com",
+      "fallback": false
+    },
+    {
+      "region": "EU",
+      "address": "eu.example.com",
+      "fallback": false
+    },
+    {
+      "region": "APAC",
+      "address": "ap.example.com",
+      "fallback": false
+    },
+    {
+      "region": "*",
+      "address": "global.example.com",
+      "fallback": true
+    }
+  ]
+}
+```
+
+### Supported Regions
+
+| Region Code | Description |
+|-------------|-------------|
+| `NA` | North America |
+| `SA` | South America |
+| `EU` | Europe |
+| `AF` | Africa |
+| `AS` | Asia |
+| `APAC` | Asia-Pacific |
+| `OC` | Oceania |
+| `*` | Fallback / Default |
+
+### Country-Level Routing
+
+For more granular control, use ISO country codes:
+
+```json
+{
+  "endpoints": [
+    {"region": "US", "address": "192.168.1.100"},
+    {"region": "CA", "address": "192.168.1.101"},
+    {"region": "GB", "address": "192.168.2.100"},
+    {"region": "DE", "address": "192.168.2.101"}
+  ]
+}
+```
+
+## Weighted Routing
+
+Distribute traffic across endpoints based on configured weights.
+
+### Configuration
+
+```json
+{
+  "name": "www-weighted",
+  "zone": "example.com",
+  "record": "www",
+  "type": "weighted",
+  "endpoints": [
+    {
+      "address": "192.168.1.100",
+      "weight": 70
+    },
+    {
+      "address": "192.168.1.101",
+      "weight": 20
+    },
+    {
+      "address": "192.168.1.102",
+      "weight": 10
+    }
+  ]
+}
+```
+
+### Use Cases
+
+- **Blue/Green deployments** - Gradually shift traffic to new version
+- **A/B testing** - Send percentage of traffic to test endpoints
+- **Capacity balancing** - Route more traffic to higher-capacity servers
+
+### Dynamic Weight Adjustment
+
+Weights can be updated via API without recreating the policy:
+
+```bash
+curl -X PATCH http://localhost:8080/api/v1/policies/www-weighted/endpoints/0 \
+  -H "Content-Type: application/json" \
+  -d '{"weight": 50}'
+```
+
+## Latency-Based Routing
+
+Route traffic to the endpoint with the lowest measured latency.
+
+### Configuration
+
+```json
+{
+  "name": "www-latency",
+  "zone": "example.com",
+  "record": "www",
+  "type": "latency",
+  "endpoints": [
+    {"address": "192.168.1.100", "location": "us-west"},
+    {"address": "192.168.2.100", "location": "us-east"},
+    {"address": "192.168.3.100", "location": "eu-west"}
+  ],
+  "latency_config": {
+    "probe_interval": "30s",
+    "probe_timeout": "5s"
+  }
+}
+```
+
+### How Latency is Measured
+
+ResolvX periodically probes each endpoint and tracks response times. When a query arrives, the endpoint with the lowest average latency is selected.
+
+## Failover Routing
+
+Configure primary and backup endpoints with automatic failover.
+
+### Configuration
+
+```json
+{
+  "name": "www-failover",
+  "zone": "example.com",
+  "record": "www",
+  "type": "failover",
+  "endpoints": [
+    {
+      "address": "192.168.1.100",
+      "priority": 1,
+      "role": "primary"
+    },
+    {
+      "address": "192.168.2.100",
+      "priority": 2,
+      "role": "secondary"
+    },
+    {
+      "address": "192.168.3.100",
+      "priority": 3,
+      "role": "tertiary"
+    }
+  ],
+  "health_check": {
+    "type": "http",
+    "path": "/health",
+    "interval": "10s",
+    "threshold": 3
+  }
+}
+```
+
+### Failover Behavior
+
+1. Traffic goes to the highest priority healthy endpoint
+2. If primary fails health checks, traffic shifts to secondary
+3. When primary recovers, traffic automatically fails back
+
+## Managing Policies
+
+### List Policies
+
+```bash
+curl http://localhost:8080/api/v1/policies
+```
+
+### Get Policy Details
+
+```bash
+curl http://localhost:8080/api/v1/policies/{policy_name}
+```
+
+### Update Policy
+
+```bash
+curl -X PUT http://localhost:8080/api/v1/policies/{policy_name} \
+  -H "Content-Type: application/json" \
+  -d '{...}'
+```
+
+### Delete Policy
+
+```bash
+curl -X DELETE http://localhost:8080/api/v1/policies/{policy_name}
+```
+
+## Next Steps
+
+- [Health Checks](/docs/health-checks) - Configure endpoint health monitoring
+- [Clustering](/docs/clustering) - Set up high availability

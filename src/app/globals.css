@@ -42,41 +42,105 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  /* Marketing page custom colors */
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-border-subtle: var(--border-subtle);
+  --color-btn-primary-bg: var(--btn-primary-bg);
+  --color-btn-primary-text: var(--btn-primary-text);
+  --color-btn-secondary-bg: var(--btn-secondary-bg);
+  --color-btn-secondary-border: var(--btn-secondary-border);
 }
 
+/* Light mode (default) */
 :root {
   --radius: 0.625rem;
-  --background: oklch(0.07 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.12 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.12 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.07 0 0);
-  --secondary: oklch(0.18 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.18 0 0);
-  --muted-foreground: oklch(0.6 0 0);
-  --accent: oklch(0.18 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 10%);
-  --ring: oklch(0.985 0 0 / 20%);
+  --background: oklch(0.99 0 0);
+  --foreground: oklch(0.13 0 0);
+  --card: oklch(0.97 0 0);
+  --card-foreground: oklch(0.13 0 0);
+  --popover: oklch(0.99 0 0);
+  --popover-foreground: oklch(0.13 0 0);
+  --primary: oklch(0.13 0 0);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.95 0 0);
+  --secondary-foreground: oklch(0.13 0 0);
+  --muted: oklch(0.95 0 0);
+  --muted-foreground: oklch(0.45 0 0);
+  --accent: oklch(0.95 0 0);
+  --accent-foreground: oklch(0.13 0 0);
+  --destructive: oklch(0.55 0.2 25);
+  --border: oklch(0 0 0 / 10%);
+  --input: oklch(0 0 0 / 10%);
+  --ring: oklch(0.13 0 0 / 20%);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.1 0 0);
+  --sidebar: oklch(0.97 0 0);
+  --sidebar-foreground: oklch(0.13 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.95 0 0);
+  --sidebar-accent-foreground: oklch(0.13 0 0);
+  --sidebar-border: oklch(0 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+  /* Marketing page */
+  --surface: oklch(0 0 0 / 3%);
+  --surface-hover: oklch(0 0 0 / 5%);
+  --text-primary: oklch(0.13 0 0);
+  --text-secondary: oklch(0.4 0 0);
+  --text-muted: oklch(0.55 0 0);
+  --border-subtle: oklch(0 0 0 / 8%);
+  --btn-primary-bg: oklch(0.13 0 0);
+  --btn-primary-text: oklch(0.99 0 0);
+  --btn-secondary-bg: oklch(0 0 0 / 5%);
+  --btn-secondary-border: oklch(0 0 0 / 10%);
+}
+
+/* Dark mode */
+.dark {
+  --background: oklch(0.05 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.08 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.08 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.05 0 0);
+  --secondary: oklch(0.15 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.15 0 0);
+  --muted-foreground: oklch(0.55 0 0);
+  --accent: oklch(0.15 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 8%);
+  --input: oklch(1 0 0 / 8%);
+  --ring: oklch(0.985 0 0 / 20%);
+  --sidebar: oklch(0.08 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.18 0 0);
+  --sidebar-accent: oklch(0.15 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-border: oklch(1 0 0 / 8%);
   --sidebar-ring: oklch(0.556 0 0);
+  /* Marketing page */
+  --surface: oklch(1 0 0 / 2%);
+  --surface-hover: oklch(1 0 0 / 4%);
+  --text-primary: oklch(0.985 0 0);
+  --text-secondary: oklch(0.65 0 0);
+  --text-muted: oklch(0.45 0 0);
+  --border-subtle: oklch(1 0 0 / 5%);
+  --btn-primary-bg: oklch(0.985 0 0);
+  --btn-primary-text: oklch(0.05 0 0);
+  --btn-secondary-bg: oklch(1 0 0 / 5%);
+  --btn-secondary-border: oklch(1 0 0 / 10%);
 }
 
 @layer base {
@@ -88,29 +152,37 @@
   }
 }
 
-/* Override Fumadocs styles on marketing pages */
-[data-slot="button"] {
-  width: auto !important;
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
 }
 
-[data-slot="button"].w-full {
-  width: 100% !important;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-@media (min-width: 640px) {
-  [data-slot="button"].sm\:w-auto {
-    width: auto !important;
-  }
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-/* Ensure header and footer links display correctly */
+::-webkit-scrollbar-thumb {
+  background: oklch(0.5 0 0 / 30%);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.5 0 0 / 50%);
+}
+
+/* Marketing page link overrides */
 header a,
 footer a {
   display: inline-flex;
   width: auto;
 }
 
-/* Force header nav visibility on desktop */
 @media (min-width: 768px) {
   header nav .hidden.md\:flex {
     display: flex !important;
@@ -126,99 +198,4 @@ footer ul {
 footer li {
   margin: 0;
   padding: 0;
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Custom scrollbar for dark theme */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: oklch(0.3 0 0);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.4 0 0);
-}
-
-/* Gradient text utility */
-.gradient-text {
-  background: linear-gradient(to right, #fff, #888);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Glow effect */
-.glow {
-  box-shadow: 0 0 40px -10px rgba(255, 255, 255, 0.15);
-}
-
-/* Grid pattern background */
-.grid-pattern {
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 64px 64px;
-}
-
-/* Fade in animation */
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in {
-  animation: fade-in 0.6s ease-out forwards;
-}
-
-.animate-fade-in-delay-1 {
-  animation: fade-in 0.6s ease-out 0.1s forwards;
-  opacity: 0;
-}
-
-.animate-fade-in-delay-2 {
-  animation: fade-in 0.6s ease-out 0.2s forwards;
-  opacity: 0;
-}
-
-.animate-fade-in-delay-3 {
-  animation: fade-in 0.6s ease-out 0.3s forwards;
-  opacity: 0;
-}
-
-/* Gradient border */
-.gradient-border {
-  position: relative;
-}
-
-.gradient-border::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), transparent);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
 }

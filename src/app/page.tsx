@@ -1,29 +1,26 @@
 import Link from "next/link";
-import { ArrowRight, Terminal, Globe, Shield, Zap, Server, GitBranch, CheckCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight, Terminal, Globe, Shield, Zap, Server, GitBranch, Check } from "lucide-react";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 
 const features = [
   {
     icon: Terminal,
-    title: "Single Binary",
+    title: "Single Binary Deployment",
     description:
-      "Everything compiles into one executable. No Redis, no NATS cluster, no external databases to manage.",
+      "Everything compiles into one executable. No Redis, no NATS cluster, no external databases to install or manage.",
   },
   {
     icon: Globe,
     title: "Global Traffic Management",
     description:
-      "Built-in GTM with geographic, weighted, latency-based, and failover routing policies.",
+      "Built-in GTM with geographic, weighted, latency-based, and failover routing policies out of the box.",
   },
   {
     icon: Shield,
     title: "Enterprise Ready",
     description:
-      "Health checks, automatic failover, and cluster-managed virtual IPs for high availability.",
+      "Health checks, automatic failover, and cluster-managed virtual IPs for production-grade high availability.",
   },
   {
     icon: Zap,
@@ -35,180 +32,231 @@ const features = [
     icon: Server,
     title: "Easy Clustering",
     description:
-      "Add --join=peer:6222 and you have a cluster. Embedded NATS handles all coordination.",
+      "Add --join=peer:6222 and you have a cluster. Embedded NATS handles all the coordination automatically.",
   },
   {
     icon: GitBranch,
     title: "Open Source",
     description:
-      "MIT licensed, fully open source. Inspect, modify, and contribute to the codebase.",
+      "MIT licensed and fully open source. Inspect the code, modify it, and contribute back to the community.",
   },
 ];
 
 const architectureItems = [
   { label: "DNS Server", detail: "miekg/dns" },
-  { label: "Storage", detail: "BadgerDB (embedded)" },
-  { label: "Cache", detail: "Ristretto (in-memory)" },
-  { label: "Events", detail: "NATS (embedded)" },
-  { label: "API", detail: "REST + Web UI" },
-  { label: "HA", detail: "VIP + Leader Election" },
+  { label: "Storage", detail: "BadgerDB" },
+  { label: "Cache", detail: "Ristretto" },
+  { label: "Events", detail: "NATS" },
+  { label: "API", detail: "REST + UI" },
+  { label: "HA", detail: "VIP + Election" },
+];
+
+const usedBy = [
+  "Enterprise Teams",
+  "Platform Engineers",
+  "DevOps Teams",
+  "Cloud Native Projects",
 ];
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <Header />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-32">
-        {/* Background grid */}
-        <div className="absolute inset-0 grid-pattern opacity-50" />
-
-        {/* Gradient orb */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 h-[600px] w-[600px] rounded-full bg-gradient-to-r from-purple-500/20 via-blue-500/20 to-cyan-500/20 blur-3xl" />
-
-        <div className="relative mx-auto max-w-7xl px-6">
-          <div className="mx-auto max-w-3xl text-center">
-            <Badge variant="outline" className="mb-6 border-white/20 text-gray-400">
-              Open Source DNS & GTM
-            </Badge>
-
-            <h1 className="text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl animate-fade-in">
-              <span className="gradient-text">Single Binary.</span>
-              <br />
-              <span className="text-white">Zero Dependencies.</span>
-            </h1>
-
-            <p className="mt-6 text-lg text-gray-400 md:text-xl animate-fade-in-delay-1">
-              ResolvX is an open-source DNS server with built-in Global Traffic Management.
-              Everything you need for enterprise DNS in one executable.
-            </p>
-
-            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center animate-fade-in-delay-2">
-              <Button
-                size="lg"
-                className="bg-white text-black hover:bg-gray-200 w-full sm:w-auto"
-                asChild
+      <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
+        {/* Background graphic */}
+        <div className="pointer-events-none absolute inset-0">
+          {/* Grid pattern */}
+          <svg
+            className="absolute inset-0 h-full w-full"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <pattern
+                id="grid"
+                width="60"
+                height="60"
+                patternUnits="userSpaceOnUse"
               >
-                <Link href="https://github.com/resolvx/resolvx">
-                  Get Started
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-white/20 bg-transparent text-white hover:bg-white/10 w-full sm:w-auto"
-                asChild
-              >
-                <Link href="https://github.com/resolvx/resolvx">
-                  View on GitHub
-                </Link>
-              </Button>
-            </div>
+                <path
+                  d="M 60 0 L 0 0 0 60"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.06)"
+                  strokeWidth="1"
+                />
+              </pattern>
+              <radialGradient id="fade" cx="50%" cy="0%" r="70%">
+                <stop offset="0%" stopColor="white" />
+                <stop offset="100%" stopColor="black" />
+              </radialGradient>
+              <mask id="gridMask">
+                <rect width="100%" height="100%" fill="url(#fade)" />
+              </mask>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" mask="url(#gridMask)" />
+          </svg>
 
-            {/* Quick start command */}
-            <div className="mt-12 animate-fade-in-delay-3">
-              <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 backdrop-blur-sm">
-                <Terminal className="h-4 w-4 text-gray-500" />
-                <code className="text-sm text-gray-300">resolvx server --config /etc/resolvx.yaml</code>
-              </div>
+          {/* Glowing orbs */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px]">
+            <div className="absolute top-20 left-[20%] w-[400px] h-[400px] rounded-full bg-emerald-500/30 blur-[150px]" />
+            <div className="absolute top-10 right-[20%] w-[350px] h-[350px] rounded-full bg-cyan-500/25 blur-[150px]" />
+            <div className="absolute top-40 left-[40%] w-[300px] h-[300px] rounded-full bg-purple-500/20 blur-[150px]" />
+          </div>
+
+          {/* Bottom fade */}
+          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent" />
+        </div>
+
+        <div className="relative mx-auto max-w-3xl px-6 text-center">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 mb-8 text-[13px] text-text-secondary bg-surface border border-border-subtle rounded-full">
+            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+            Open Source DNS & GTM
+          </div>
+
+          {/* Main headline */}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-[1.1] mb-6">
+            DNS Infrastructure
+            <br />
+            <span className="text-text-muted">Made Simple</span>
+          </h1>
+
+          {/* Subtitle */}
+          <p className="text-lg md:text-xl text-text-secondary leading-relaxed mb-10 max-w-2xl mx-auto">
+            The single-binary DNS server with built-in global traffic management.
+            No dependencies, no complexity—just deploy and go.
+          </p>
+
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="https://github.com/resolvx/resolvx"
+              className="inline-flex items-center gap-2 px-6 py-3 text-[15px] font-medium text-btn-primary-text bg-btn-primary-bg rounded-full hover:opacity-90 transition-opacity"
+            >
+              Get Started
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              href="/docs"
+              className="inline-flex items-center gap-2 px-6 py-3 text-[15px] font-medium text-foreground bg-btn-secondary-bg border border-btn-secondary-border rounded-full hover:bg-surface-hover transition-colors"
+            >
+              Read the Docs
+            </Link>
+          </div>
+
+          {/* Quick command */}
+          <div className="mt-12">
+            <div className="inline-flex items-center gap-3 px-5 py-3 bg-surface border border-border-subtle rounded-2xl">
+              <Terminal className="w-4 h-4 text-text-muted" />
+              <code className="text-[14px] text-text-secondary font-mono">
+                resolvx server --config /etc/resolvx.yaml
+              </code>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Used By Section */}
+      <section className="py-16 border-t border-border-subtle">
+        <div className="mx-auto max-w-6xl px-6">
+          <p className="text-center text-[13px] text-text-muted uppercase tracking-wider mb-8">
+            Built for
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
+            {usedBy.map((name) => (
+              <span key={name} className="text-[15px] text-text-secondary font-medium">
+                {name}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
-      <section id="features" className="py-20 md:py-32">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mx-auto max-w-2xl text-center">
-            <Badge variant="outline" className="mb-4 border-white/20 text-gray-400">
-              Features
-            </Badge>
-            <h2 className="text-3xl font-bold md:text-4xl">
-              Everything you need for DNS & GTM
+      <section id="features" className="py-24 md:py-32">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight mb-4">
+              Everything you need
             </h2>
-            <p className="mt-4 text-gray-400">
-              No external services required. Deploy a single binary and get a production-ready
-              DNS server with global traffic management.
+            <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+              A complete DNS solution with global traffic management,
+              all in a single binary with zero external dependencies.
             </p>
           </div>
 
-          <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature, index) => (
-              <Card
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {features.map((feature) => (
+              <div
                 key={feature.title}
-                className="group border-white/10 bg-white/5 backdrop-blur-sm transition-all hover:border-white/20 hover:bg-white/10"
+                className="group p-6 bg-surface border border-border-subtle rounded-2xl hover:bg-surface-hover hover:border-border transition-all"
               >
-                <CardContent className="p-6">
-                  <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-white/10">
-                    <feature.icon className="h-5 w-5 text-white" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-white">{feature.title}</h3>
-                  <p className="mt-2 text-sm text-gray-400">{feature.description}</p>
-                </CardContent>
-              </Card>
+                <div className="w-10 h-10 flex items-center justify-center bg-surface-hover rounded-xl mb-4">
+                  <feature.icon className="w-5 h-5 text-text-secondary" />
+                </div>
+                <h3 className="text-[17px] font-semibold mb-2">{feature.title}</h3>
+                <p className="text-[15px] text-text-secondary leading-relaxed">
+                  {feature.description}
+                </p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Architecture Section */}
-      <section id="architecture" className="py-20 md:py-32 border-t border-white/10">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="grid gap-12 lg:grid-cols-2 lg:gap-20 items-center">
+      <section id="architecture" className="py-24 md:py-32 border-t border-border-subtle">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <Badge variant="outline" className="mb-4 border-white/20 text-gray-400">
-                Architecture
-              </Badge>
-              <h2 className="text-3xl font-bold md:text-4xl">
+              <h2 className="text-3xl md:text-4xl font-semibold tracking-tight mb-4">
                 Embedded, not external
               </h2>
-              <p className="mt-4 text-gray-400">
-                Unlike traditional DNS/GTM setups that require separate Redis, NATS, databases,
-                and load balancers, ResolvX embeds everything. The result: <code className="text-white">resolvx server</code> gives
-                you everything.
+              <p className="text-lg text-text-secondary leading-relaxed mb-8">
+                Unlike traditional DNS/GTM setups that require separate Redis, NATS,
+                databases, and load balancers—ResolvX embeds everything.
+                One binary gives you a complete solution.
               </p>
 
-              <div className="mt-8 space-y-3">
+              <div className="grid grid-cols-2 gap-3">
                 {architectureItems.map((item) => (
                   <div
                     key={item.label}
-                    className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-4 py-3"
+                    className="flex items-center justify-between p-3 bg-surface border border-border-subtle rounded-xl"
                   >
-                    <span className="text-sm font-medium text-white">{item.label}</span>
-                    <span className="text-sm text-gray-500">{item.detail}</span>
+                    <span className="text-[14px] font-medium">{item.label}</span>
+                    <span className="text-[13px] text-text-muted">{item.detail}</span>
                   </div>
                 ))}
               </div>
             </div>
 
+            {/* Terminal mockup */}
             <div className="relative">
-              {/* Terminal mockup */}
-              <div className="rounded-xl border border-white/10 bg-black/50 backdrop-blur-sm overflow-hidden glow">
-                <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
-                  <div className="h-3 w-3 rounded-full bg-red-500/80" />
-                  <div className="h-3 w-3 rounded-full bg-yellow-500/80" />
-                  <div className="h-3 w-3 rounded-full bg-green-500/80" />
-                  <span className="ml-2 text-xs text-gray-500">terminal</span>
+              <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-2xl">
+                <div className="flex items-center gap-2 px-4 py-3 border-b border-border-subtle">
+                  <div className="w-3 h-3 rounded-full bg-surface-hover" />
+                  <div className="w-3 h-3 rounded-full bg-surface-hover" />
+                  <div className="w-3 h-3 rounded-full bg-surface-hover" />
+                  <span className="ml-2 text-[12px] text-text-muted">terminal</span>
                 </div>
-                <div className="p-4 font-mono text-sm">
-                  <div className="text-gray-500"># Start a single node</div>
-                  <div className="text-green-400">$ resolvx server</div>
-                  <div className="mt-4 text-gray-500"># Or join a cluster</div>
-                  <div className="text-green-400">$ resolvx server --join=node1:6222</div>
-                  <div className="mt-4 text-gray-500"># DNS ready on :53, API on :8080</div>
-                  <div className="text-gray-400">
-                    <span className="text-blue-400">INFO</span> DNS server listening on :53
+                <div className="p-5 font-mono text-[13px] leading-relaxed">
+                  <div className="text-text-muted"># Start a single node</div>
+                  <div className="text-emerald-500 dark:text-emerald-400">$ resolvx server</div>
+                  <div className="mt-4 text-text-muted"># Or join a cluster</div>
+                  <div className="text-emerald-500 dark:text-emerald-400">$ resolvx server --join=node1:6222</div>
+                  <div className="mt-4 text-text-secondary">
+                    <span className="text-blue-500 dark:text-blue-400">INFO</span> DNS server listening on :53
                   </div>
-                  <div className="text-gray-400">
-                    <span className="text-blue-400">INFO</span> API server listening on :8080
+                  <div className="text-text-secondary">
+                    <span className="text-blue-500 dark:text-blue-400">INFO</span> API server listening on :8080
                   </div>
-                  <div className="text-gray-400">
-                    <span className="text-blue-400">INFO</span> NATS embedded server started
+                  <div className="text-text-secondary">
+                    <span className="text-blue-500 dark:text-blue-400">INFO</span> NATS embedded server started
                   </div>
-                  <div className="text-gray-400">
-                    <span className="text-green-400">INFO</span> Ready to serve queries
+                  <div className="text-text-secondary">
+                    <span className="text-emerald-500 dark:text-emerald-400">INFO</span> Ready to serve queries
                   </div>
                 </div>
               </div>
@@ -218,35 +266,34 @@ export default function Home() {
       </section>
 
       {/* GTM Policies Section */}
-      <section className="py-20 md:py-32 border-t border-white/10">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mx-auto max-w-2xl text-center">
-            <Badge variant="outline" className="mb-4 border-white/20 text-gray-400">
-              Traffic Management
-            </Badge>
-            <h2 className="text-3xl font-bold md:text-4xl">
-              Intelligent routing policies
+      <section className="py-24 md:py-32 border-t border-border-subtle">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight mb-4">
+              Intelligent routing
             </h2>
-            <p className="mt-4 text-gray-400">
+            <p className="text-lg text-text-secondary max-w-2xl mx-auto">
               Route traffic based on geography, latency, weights, or health status.
               Mix and match policies for complex routing scenarios.
             </p>
           </div>
 
-          <div className="mt-16 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {[
-              { title: "Geographic", desc: "Route by client location using GeoIP" },
-              { title: "Weighted", desc: "Distribute traffic across endpoints" },
-              { title: "Latency", desc: "Route to fastest responding endpoint" },
-              { title: "Failover", desc: "Automatic primary/backup switching" },
+              { title: "Geographic", desc: "Route by client location" },
+              { title: "Weighted", desc: "Distribute across endpoints" },
+              { title: "Latency", desc: "Fastest response wins" },
+              { title: "Failover", desc: "Automatic backup switching" },
             ].map((policy) => (
               <div
                 key={policy.title}
-                className="rounded-lg border border-white/10 bg-white/5 p-6 text-center"
+                className="p-5 bg-surface border border-border-subtle rounded-2xl text-center"
               >
-                <CheckCircle className="mx-auto h-8 w-8 text-green-500 mb-3" />
-                <h3 className="font-semibold text-white">{policy.title}</h3>
-                <p className="mt-2 text-sm text-gray-500">{policy.desc}</p>
+                <div className="w-8 h-8 flex items-center justify-center bg-emerald-500/10 rounded-lg mx-auto mb-3">
+                  <Check className="w-4 h-4 text-emerald-500" />
+                </div>
+                <h3 className="text-[15px] font-semibold mb-1">{policy.title}</h3>
+                <p className="text-[14px] text-text-muted">{policy.desc}</p>
               </div>
             ))}
           </div>
@@ -254,41 +301,35 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 md:py-32 border-t border-white/10">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-8 md:p-16">
-            {/* Background decoration */}
-            <div className="absolute top-0 right-0 h-64 w-64 rounded-full bg-blue-500/10 blur-3xl" />
-            <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-purple-500/10 blur-3xl" />
+      <section className="py-24 md:py-32 border-t border-border-subtle">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="relative p-12 md:p-16 bg-gradient-to-br from-surface to-surface/50 border border-border rounded-3xl text-center overflow-hidden">
+            {/* Decorative elements */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl" />
 
-            <div className="relative mx-auto max-w-2xl text-center">
-              <h2 className="text-3xl font-bold md:text-4xl">
+            <div className="relative">
+              <h2 className="text-3xl md:text-4xl font-semibold tracking-tight mb-4">
                 Ready to simplify your DNS?
               </h2>
-              <p className="mt-4 text-gray-400">
-                Get started with ResolvX in minutes. Download the binary, write your config, and go.
+              <p className="text-lg text-text-secondary mb-8 max-w-xl mx-auto">
+                Get started with ResolvX in minutes. Download the binary,
+                write your config, and you're ready to go.
               </p>
-              <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-                <Button
-                  size="lg"
-                  className="bg-white text-black hover:bg-gray-200 w-full sm:w-auto"
-                  asChild
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Link
+                  href="https://github.com/resolvx/resolvx/releases"
+                  className="inline-flex items-center gap-2 px-6 py-3 text-[15px] font-medium text-btn-primary-text bg-btn-primary-bg rounded-full hover:opacity-90 transition-opacity"
                 >
-                  <Link href="https://github.com/resolvx/resolvx/releases">
-                    Download
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="border-white/20 bg-transparent text-white hover:bg-white/10 w-full sm:w-auto"
-                  asChild
+                  Download
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  href="/docs"
+                  className="inline-flex items-center gap-2 px-6 py-3 text-[15px] font-medium text-foreground bg-btn-secondary-bg border border-btn-secondary-border rounded-full hover:bg-surface-hover transition-colors"
                 >
-                  <Link href="https://github.com/resolvx/resolvx#readme">
-                    Read the Docs
-                  </Link>
-                </Button>
+                  Read the Docs
+                </Link>
               </div>
             </div>
           </div>

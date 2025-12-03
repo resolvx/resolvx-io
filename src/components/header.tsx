@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 const navItems = [
   { label: "Features", href: "#features" },
@@ -17,72 +16,88 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-md">
-      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-        <Link href="/" className="inline-flex items-center gap-2">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-xl border-b border-border-subtle">
+      <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
+        <Link href="/" className="inline-flex items-center gap-2.5">
           <Image
             src="/logo.svg"
             alt="ResolvX"
-            width={32}
-            height={32}
-            className="invert"
+            width={26}
+            height={26}
+            className="dark:invert"
           />
-          <span className="text-lg font-semibold text-white">ResolvX</span>
+          <span className="text-[15px] font-semibold text-foreground">ResolvX</span>
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-1">
           {navItems.map((item) => (
             <Link
               key={item.label}
               href={item.href}
-              className="inline-block text-sm text-gray-400 transition-colors hover:text-white"
+              className="px-3.5 py-2 text-[13px] text-text-secondary transition-colors hover:text-foreground rounded-lg hover:bg-surface"
             >
               {item.label}
             </Link>
           ))}
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-white/20 bg-transparent text-white hover:bg-white/10"
-            asChild
+        </div>
+
+        {/* Desktop CTAs */}
+        <div className="hidden md:flex items-center gap-3">
+          <Link
+            href="/docs"
+            className="px-4 py-2 text-[13px] text-text-secondary transition-colors hover:text-foreground"
           >
-            <Link href="https://github.com/resolvx/resolvx">Get Started</Link>
-          </Button>
+            Documentation
+          </Link>
+          <Link
+            href="https://github.com/resolvx/resolvx"
+            className="px-4 py-2 text-[13px] font-medium text-btn-primary-text bg-btn-primary-bg rounded-full hover:opacity-90 transition-opacity"
+          >
+            Get Started
+          </Link>
         </div>
 
         {/* Mobile menu button */}
         <button
-          className="md:hidden text-white p-2"
+          className="md:hidden text-foreground p-2 -mr-2"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Toggle menu"
         >
-          {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </nav>
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-white/10 bg-black/95 backdrop-blur-md">
-          <div className="flex flex-col gap-4 px-6 py-4">
+        <div className="md:hidden border-t border-border-subtle bg-background/95 backdrop-blur-xl">
+          <div className="flex flex-col px-6 py-4">
             {navItems.map((item) => (
               <Link
                 key={item.label}
                 href={item.href}
-                className="inline-block text-sm text-gray-400 transition-colors hover:text-white"
+                className="py-2.5 text-[14px] text-text-secondary transition-colors hover:text-foreground"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {item.label}
               </Link>
             ))}
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-white/20 bg-transparent text-white hover:bg-white/10 w-fit"
-              asChild
-            >
-              <Link href="https://github.com/resolvx/resolvx">Get Started</Link>
-            </Button>
+            <div className="mt-4 pt-4 border-t border-border-subtle flex flex-col gap-3">
+              <Link
+                href="/docs"
+                className="py-2.5 text-[14px] text-text-secondary hover:text-foreground"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Documentation
+              </Link>
+              <Link
+                href="https://github.com/resolvx/resolvx"
+                className="py-2.5 px-4 text-[14px] font-medium text-btn-primary-text bg-btn-primary-bg rounded-full hover:opacity-90 transition-opacity text-center"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Get Started
+              </Link>
+            </div>
           </div>
         </div>
       )}
